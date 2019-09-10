@@ -8,4 +8,6 @@ import com.hungryTripperDemo.modal.Customer;
 @Repository
 public interface CustomerRepository extends MongoRepository<Customer, Integer>{
 
+	
+
 }

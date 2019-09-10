@@ -4,10 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
+import javax.xml.ws.WebServiceException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,27 +30,30 @@ public class CustomerController {
 
 	@Autowired
 	private CustomerService customerService;
-	
+
 	@Autowired
 	private CustomerRepository customerRepository;
 
 	@RequestMapping(value = "/addcustomer", method = RequestMethod.POST, consumes = "application/json")
-	public @ResponseBody CustomerResponse saveCustomer(@Valid @RequestBody CustomerForm customerForm, BindingResult bindingResult) {
+	public @ResponseBody CustomerResponse saveCustomer(@Valid @RequestBody CustomerForm customerForm,
+			BindingResult bindingResult) throws Exception {
 		if (bindingResult.hasErrors()) {
 			System.out.println(bindingResult.getAllErrors());
 			response.setResponseCode("201");
-			response.setResponseDesc("Error Occured");			
+			response.setResponseDesc("Error Occured");				
+			List<ObjectError> errors = bindingResult.getAllErrors();
+			response.setResponseDesc(errors.get(0).getDefaultMessage());
 			return response;
 		}
+		//else 
 		try {
 			Customer customer = new Customer();
 			converFormtoDO(customerForm, customer);
 			String respDesc = customerService.saveCustomer(customer);
 			response.setResponseCode("200");
 			response.setResponseDesc(respDesc);
-
 		} catch (Exception e) {
-			response.setResponseCode("201");
+			response.setResponseCode("401");
 			response.setResponseDesc("Error Occured");
 			return response;
 		}
@@ -57,7 +61,9 @@ public class CustomerController {
 
 	}
 
-	/** This method is used to copy data from form to DO object
+	/**
+	 * This method is used to copy data from form to DO object
+	 * 
 	 * @param customerForm
 	 * @param customer
 	 * @return
@@ -73,50 +79,53 @@ public class CustomerController {
 		customer.setActive(customerForm.getActive());
 		return customer;
 	}
-
 	
-	  @RequestMapping(value="/getcustomer/{id}",method=RequestMethod.GET)
-	  public Optional<Customer> getCustomerById(@PathVariable  int id )
-	  {
-		  return customerRepository.findById(id);
-	   }
-	  
-	  @RequestMapping(value="/getcustomers",method=RequestMethod.GET)
-	  public List<Customer> getAllCustomer() 
-	  { 
-		  return customerRepository.findAll(); 
-		}
-	  
-	  @RequestMapping(value = "/update", method = RequestMethod.PUT, consumes = "application/json")
-		public @ResponseBody CustomerResponse updateCustomer(@Valid @RequestBody CustomerForm customerForm, BindingResult bindingResult) {
-			if (bindingResult.hasErrors()) {
-				System.out.println(bindingResult.getAllErrors());
-				response.setResponseCode("201");
-				response.setResponseDesc("error Occured.Please check with the Validation");
-				response.setAllError(bindingResult.getAllErrors());
-				return response;
-			}
-			try {
-				Customer customer = new Customer();
-				converFormtoDO(customerForm, customer);
-				String respDesc = customerService.UpdateCustomer(customer);
-				response.setResponseCode("200");
-				response.setResponseDesc(respDesc);
+	
 
-			} catch (Exception e) {
-				response.setResponseCode("201");
-				response.setResponseDesc("Error Occured");
-				return response;
-			}
+	@RequestMapping(value = "/getcustomer/{id}", method = RequestMethod.GET)
+	public Optional<Customer> getCustomerById(@PathVariable int id) {
+		return customerRepository.findById(id);
+	}
+
+	@RequestMapping(value = "/getcustomers", method = RequestMethod.GET)
+	public List<Customer> getAllCustomer() {
+		return customerRepository.findAll();
+	}
+
+	@RequestMapping(value = "/update", method = RequestMethod.PUT, consumes = "application/json")
+	public @ResponseBody CustomerResponse updateCustomer(@Valid @RequestBody CustomerForm customerForm,
+			BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			response.setResponseCode("201");
+			response.setResponseDesc("Error Occured");				
+			List<ObjectError> errors = bindingResult.getAllErrors();
+			response.setResponseDesc(errors.get(0).getDefaultMessage());
 			return response;
-
 		}
-	  
-	  @RequestMapping("/deletecustomer/{id}") 
-	  public String deleteCustomer(@PathVariable int id) 
-	  { 
-		  customerRepository.deleteById(id); 
-		  return "Customer Deleted Successfully";
-	  }
-	 
+		try {
+			Customer customer = new Customer();
+			converFormtoDO(customerForm, customer);
+			String respDesc = customerService.UpdateCustomer(customer);
+			response.setResponseCode("200");
+			response.setResponseDesc(respDesc);
+
+		} catch (Exception e) {
+			response.setResponseCode("201");
+			response.setResponseDesc("Error Occured");
+			return response;
+		}
+		return response;
+
+	}
+
+	@RequestMapping(value = "/deletecustomer/{id}")
+	public Object  deleteCustomer(@PathVariable int id) {
+		customerRepository.deleteById(id);
+		response.setResponseCode("200");
+		response.setResponseDesc("Customer Deleted Successfully");				
+		return response;
+		
+		 
+	}
+
 }

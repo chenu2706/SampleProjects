@@ -7,5 +7,7 @@ public interface CustomerService {
 	public String saveCustomer(Customer customer)throws Exception;
 
 	public String UpdateCustomer(Customer customer) throws Exception;
+	
+	
 
 }

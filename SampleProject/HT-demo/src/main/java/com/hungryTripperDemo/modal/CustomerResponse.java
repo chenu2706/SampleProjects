@@ -9,28 +9,28 @@ import org.springframework.validation.ObjectError;
 public class CustomerResponse {
 	
 	private String responseCode;
-	private String responseField;
+	/*private String responseField;*/
 	private String responseDesc;
-	private List<ObjectError> allError;
+	/*private List<ObjectError> allError;*/
 	
-	public List<ObjectError> getAllError() {
+	/*public List<ObjectError> getAllError() {
 		return allError;
 	}
 	public void setAllError(List<ObjectError> list) {
 		this.allError = list;
-	}
+	}*/
 	public String getResponseCode() {
 		return responseCode;
 	}
 	public void setResponseCode(String responseCode) {
 		this.responseCode = responseCode;
 	}
-	public String getResponseField() {
+	/*public String getResponseField() {
 		return responseField;
 	}
 	public void setResponseField(String responseField) {
 		this.responseField = responseField;
-	}
+	}*/
 	public String getResponseDesc() {
 		return responseDesc;
 	}
