@@ -88,12 +88,12 @@ public class CustomerController {
 		}
 	  
 	  @RequestMapping(value = "/update", method = RequestMethod.PUT, consumes = "application/json")
-		public @ResponseBody CustomerResponse updateCustomer(@Valid @RequestBody CustomerForm customerForm, Errors errors) {
-			if (errors.hasErrors()) {
-				System.out.println(errors.getAllErrors());
+		public @ResponseBody CustomerResponse updateCustomer(@Valid @RequestBody CustomerForm customerForm, BindingResult bindingResult) {
+			if (bindingResult.hasErrors()) {
+				System.out.println(bindingResult.getAllErrors());
 				response.setResponseCode("201");
 				response.setResponseDesc("error Occured.Please check with the Validation");
-				response.setAllError(errors.getAllErrors());
+				response.setAllError(bindingResult.getAllErrors());
 				return response;
 			}
 			try {
